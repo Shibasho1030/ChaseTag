@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "TarzanRope.h"
+#include "TimerManager.h"
 
 // Sets default values
 AWarpActor::AWarpActor()
@@ -20,13 +21,14 @@ AWarpActor::AWarpActor()
 	CollisionBox->SetCollisionProfileName(TEXT("Trigger"));
 
 	CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AWarpActor::OnOverlapBegin);
+
+	bHasWarped = false;
 }
 
 // Called when the game starts or when spawned
 void AWarpActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -39,8 +41,16 @@ void AWarpActor::Tick(float DeltaTime)
 void AWarpActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ATarzanRope* TarzanRopeInstance = GetWorld()->SpawnActor<ATarzanRope>();
-	if (OtherActor && TargetWarpActor && TarzanRopeInstance->PlayerPower > 1.0f)
+	if (bHasWarped)
+	{
+		return;
+	}
+	ATarzanRope* TarzanRopeInstance = Cast<ATarzanRope>(UGameplayStatics::GetActorOfClass(GetWorld(), ATarzanRope::StaticClass()));
+	if (!TarzanRopeInstance)
+	{
+		return;
+	}
+	if (OtherActor && TargetWarpActor && (TarzanRopeInstance->PlayerPower > 1.0f) )
 	{
 		//FRotator  CurrentRotation = OtherActor->GetActorRotation();
 
@@ -61,4 +71,13 @@ void AWarpActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 			}
 		}
 	}
+	bHasWarped = true;
+	FTimerHandle ResetTimer;
+	GetWorld()->GetTimerManager().SetTimer(ResetTimer, this, &AWarpActor::ResetWarpFlag, 0.5f, false);
+	TarzanRopeInstance->UpdatePlayerPowerUI();
+}
+
+void AWarpActor::ResetWarpFlag()
+{
+	bHasWarped = false;
 }

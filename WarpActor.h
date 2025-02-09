@@ -35,4 +35,10 @@ private:
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Sweep);
 
+	bool bHasWarped;
+
+	UFUNCTION()
+	void ResetWarpFlag();
+	
+
 };
