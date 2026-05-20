@@ -9,9 +9,7 @@ Unreal Engine / C++ / Blueprint を使用して制作した、追跡アクショ
 ---
 
 
-## URL
-
-YouTubeプレイ動画URL：
+## YouTubeプレイ動画URL
 
 https://www.youtube.com/watch?v=U2leH5w_GJY
 
